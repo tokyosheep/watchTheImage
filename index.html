@@ -12,7 +12,7 @@
 <body class="hostElt">
 
     <div id="content">          
-        <button id="watch" class="topcoat-button--large hostFontSize">watchStart</button>
+        <button id="watch" class="topcoat-button--cta">watchStart</button>
         <button id="watchOut" class="topcoat-button--large hostFontSize">watchOut</button>
         <button id="getPlaces" class="topcoat-button--large hostFontSize">get placeImg</button>
         <button id="getAIFile" class="topcoat-button--large hostFontSize">get Ai file</button>
@@ -21,13 +21,25 @@
              <ul id="placeImgList"></ul>
         </form>
     <span id="AIpath"></span>
+    <form action="" name="resize">
+        <ul>
+            <li><label for="" class="topcoat-checkbox">
+                    <input type="checkbox" id="isResize">
+                    <div class="topcoat-checkbox__checkmark"></div>
+                    <p>resize</p>
+                </label>
+            </li>
+            <li>
+                <input type="number" class="topcoat-text-input" min="1" max="99" id="resize" disabled="true">
+            </li>
+        </ul>
+    </form>
     <!-- These are debugging shortcuts.  Class debuglink items only appear in debug mode  -->
     <span class="debuglink" id="reload">Reload</span>
     <span class="debuglink" id="debug">Debug</span>
     <span class="debuglink" id="sources">Sources</span>
     
     <script src="js/libs/CSInterface.js"></script>
-    <script src="js/libs/jquery-2.0.2.min.js"></script>
 
     <script src="js/themeManager.js"></script>
     <script src="js/main.js"></script>

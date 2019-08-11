@@ -13,30 +13,69 @@ window.onload = () =>{
     const getPlaces = document.getElementById("getPlaces");
     const AIpath = document.getElementById("AIpath");
     const placeImgList = document.getElementById("placeImgList");
+    const isResize = document.getElementById("isResize");
+    const resize = document.getElementById("resize");
+    
     const chokidar = require("chokidar");
-    const watcher = chokidar.watch(`${extensionRoot}seem.txt`,{
-        persistent:true,
+    let watcher = null;//最初にwatcher自体にnullを代入しないとcloseメソッドが正常に動かないよう
+    
+    const dir_home = process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
+    const dir_desktop = require("path").join(dir_home, "Desktop");
+    
+    isResize.addEventListener("click",()=>{
+        resize.disabled = !isResize.checked;
     });
     
     watch_on.addEventListener("click",()=>{
-        console.log(imgForm.img);
-        watcher.add(`${extensionRoot}seem.txt`);
-        watchIngFile();
+        const whichImg = document.getElementsByClassName("whichImg");
+        const index = Array.from(whichImg).findIndex(v=> v.checked === true);
+        if(index === -1){
+            alert("配置画像が選択されていません。");
+            return;
+        }
+        const filePath = whichImg[index].dataset.fullName.replace("~/Desktop",dir_desktop);
+        //Adobe　scriptだとdesktopパスは~Desktop/と取得するがCEp上だと正常に認識してくれないためnodeからdesktopパスを取得し直して置き換える必要がある。
+        watchIngFile(filePath);
         console.log(watcher);
+        alert("watch start");
     });
+    
     
     watchOut.addEventListener("click",()=>{
         watcher.close();
         console.log(watcher);
+        alert("watch stop");
     });
     
-    function watchIngFile(){
+    function watchIngFile(filePath){
         const log = console.log.bind(console);
+        console.log(filePath);
+        watcher = chokidar.watch(filePath,{
+            persistent:true,
+        });
         watcher
-        .on("add",path => log(path))
-        .on("change",path => log(path))
-        .on("unlink",path => log(path))
+        .on("add",path => {log(`the file is added${path}`); 
+            afterTriggered();
+        })
+        .on("change",path => {log(`the file was changed${path}`); 
+            afterTriggered();                     
+        })
+        .on("unlink",path => {log(`the file was removed ${path}`)
+            afterTriggered();                     
+        });
     }
+    
+    function afterTriggered(){
+        console.log(AIpath.dataset.fullname);
+        const obj = {
+            path:AIpath.dataset.fullname,
+            isResize:isResize.checked,
+            resize:resize.value
+        }
+        console.log(obj);
+        csInterface.evalScript(`trigger(${JSON.stringify(obj)})`);
+    }
+    
     
     function getPlacedImg(){
         return new Promise((resolve,reject)=>{
@@ -99,6 +138,7 @@ window.onload = () =>{
             _input.dataset.path = object.path;
             _input.dataset.name = object.name;
             _input.dataset.fullName = object.fullName;
+            _input.classList.add("whichImg");
             label.appendChild(_input);
             const div = document.createElement("div");
             div.classList.add("topcoat-radio-button__checkmark");
